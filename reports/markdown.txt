@@ -1,0 +1,58 @@
+<bound method PortScanner.csv of <nmap.nmap.PortScanner object at 0x0000013C04A21010>>===============================================================
+Gobuster v3.8.2
+by OJ Reeves (@TheColonial) & Christian Mehlmauer (@firefart)
+===============================================================
+[+] Url:                     http://scanme.nmap.org
+[+] Method:                  GET
+[+] Threads:                 10
+[+] Wordlist:                C:\Users\RTX30\Desktop\elegant\Tools\Gobuster\wordlist\Web-Content\common.txt
+[+] Negative Status codes:   404
+[+] User Agent:              gobuster/3.8.2
+[+] Timeout:                 10s
+===============================================================
+Starting gobuster in directory enumeration mode
+===============================================================
+.hta                 (Status: 403) [Size: 286]
+.htaccess            (Status: 403) [Size: 291]
+.htpasswd            (Status: 403) [Size: 291]
+.svn                 (Status: 301) [Size: 316] [--> http://scanme.nmap.org/.svn/]
+.svn/entries         (Status: 403) [Size: 294]
+favicon.ico          (Status: 403) [Size: 293]
+images               (Status: 301) [Size: 318] [--> http://scanme.nmap.org/images/]
+index                (Status: 200) [Size: 6974]
+index.html           (Status: 200) [Size: 6974]
+shared               (Status: 301) [Size: 318] [--> http://scanme.nmap.org/shared/]
+===============================================================
+Finished
+===============================================================
+[92mENUM4LINUX - next generation (v1.3.10)[0m
+
+ ==========================
+|    Target Information    |
+ ==========================
+[94m[*] Target ........... 45.33.32.156[0m
+[94m[*] Username ......... ''[0m
+[94m[*] Random Username .. 'vleewvcv'[0m
+[94m[*] Password ......... ''[0m
+[94m[*] Timeout .......... 10 second(s)[0m
+
+ =====================================
+|    Listener Scan on 45.33.32.156    |
+ =====================================
+[94m[*] Checking LDAP[0m
+[91m[-] Could not connect to LDAP on 389/tcp: connection refused[0m
+[94m[*] Checking LDAPS[0m
+[91m[-] Could not connect to LDAPS on 636/tcp: connection refused[0m
+[94m[*] Checking SMB[0m
+[91m[-] Could not connect to SMB on 445/tcp: timed out[0m
+[94m[*] Checking SMB over NetBIOS[0m
+[91m[-] Could not connect to SMB over NetBIOS on 139/tcp: timed out[0m
+
+ ===========================================================
+|    NetBIOS Names and Workgroup/Domain for 45.33.32.156    |
+ ===========================================================
+[91m[-] Could not get NetBIOS names information via 'nmblookup': timed out[0m
+
+[93m[!] Aborting remainder of tests since neither SMB nor LDAP are accessible[0m
+
+Completed after 30.38 seconds
