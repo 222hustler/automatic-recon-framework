@@ -1,11 +1,31 @@
-<bound method PortScanner.csv of <nmap.nmap.PortScanner object at 0x0000013C04A21010>>===============================================================
+# Recon Report
+
+## Nmap Scan
+
+**Host:** 45.33.32.156 (scanme.nmap.org)
+
+| Port | State | Service | Version |
+|------|-------|---------|----------|
+| 22 | open | ssh | 6.6.1p1 Ubuntu 2ubuntu2.13 |
+| 25 | filtered | smtp |  |
+| 80 | open | http | 2.4.7 |
+| 135 | filtered | msrpc |  |
+| 139 | filtered | netbios-ssn |  |
+| 445 | filtered | microsoft-ds |  |
+| 9929 | open | nping-echo |  |
+| 31337 | open | tcpwrapped |  |
+
+## Gobuster
+
+```
+===============================================================
 Gobuster v3.8.2
 by OJ Reeves (@TheColonial) & Christian Mehlmauer (@firefart)
 ===============================================================
 [+] Url:                     http://scanme.nmap.org
 [+] Method:                  GET
 [+] Threads:                 10
-[+] Wordlist:                C:\Users\RTX30\Desktop\elegant\Tools\Gobuster\wordlist\Web-Content\common.txt
+[+] Wordlist:                /mnt/c/Users/RTX30/Desktop/elegant/IT_Journey/Automatic_Recon_Framework/automatic-recon-framework/wordlist/common.txt
 [+] Negative Status codes:   404
 [+] User Agent:              gobuster/3.8.2
 [+] Timeout:                 10s
@@ -25,6 +45,12 @@ shared               (Status: 301) [Size: 318] [--> http://scanme.nmap.org/share
 ===============================================================
 Finished
 ===============================================================
+
+```
+
+## Enum4linux
+
+```
 [92mENUM4LINUX - next generation (v1.3.10)[0m
 
  ==========================
@@ -32,7 +58,7 @@ Finished
  ==========================
 [94m[*] Target ........... 45.33.32.156[0m
 [94m[*] Username ......... ''[0m
-[94m[*] Random Username .. 'vleewvcv'[0m
+[94m[*] Random Username .. 'lonzgcty'[0m
 [94m[*] Password ......... ''[0m
 [94m[*] Timeout .......... 10 second(s)[0m
 
@@ -55,4 +81,65 @@ Finished
 
 [93m[!] Aborting remainder of tests since neither SMB nor LDAP are accessible[0m
 
-Completed after 30.38 seconds
+Completed after 30.35 seconds
+
+```
+
+## SMBclient
+
+```
+
+```
+
+## CVEs Found
+
+### CVE-2026-9999
+**Score CVSS:** N/A
+
+Inappropriate implementation in ANGLE in Google Chrome on Mac prior to 148.0.7778.216 allowed a remote attacker to execute arbitrary code inside a sandbox via a crafted HTML page. (Chromium security severity: High)
+
+### CVE-2026-9998
+**Score CVSS:** N/A
+
+Integer overflow in Skia in Google Chrome prior to 148.0.7778.216 allowed a remote attacker who had compromised the renderer process to potentially perform a sandbox escape via a crafted HTML page. (Chromium security severity: High)
+
+### CVE-2026-9997
+**Score CVSS:** N/A
+
+Use after free in Input in Google Chrome prior to 148.0.7778.216 allowed a remote attacker who had compromised the renderer process to potentially perform a sandbox escape via a crafted HTML page. (Chromium security severity: High)
+
+### CVE-2026-9996
+**Score CVSS:** N/A
+
+Out of bounds read in WebRTC in Google Chrome on Mac prior to 148.0.7778.216 allowed a remote attacker to obtain potentially sensitive information from process memory via a crafted HTML page. (Chromium security severity: High)
+
+### CVE-2026-9995
+**Score CVSS:** N/A
+
+Use after free in WebXR in Google Chrome prior to 148.0.7778.216 allowed a remote attacker to execute arbitrary code inside a sandbox via a crafted HTML page. (Chromium security severity: High)
+
+### CVE-2026-9994
+**Score CVSS:** N/A
+
+Use after free in Core in Google Chrome on Windows prior to 148.0.7778.216 allowed a remote attacker who had compromised the renderer process to potentially perform a sandbox escape via a crafted HTML page. (Chromium security severity: High)
+
+### CVE-2026-9993
+**Score CVSS:** N/A
+
+Use after free in Views in Google Chrome prior to 148.0.7778.216 allowed a remote attacker who had compromised the renderer process to potentially perform a sandbox escape via a crafted PDF file. (Chromium security severity: High)
+
+### CVE-2026-9992
+**Score CVSS:** N/A
+
+Use after free in Network in Google Chrome prior to 148.0.7778.216 allowed a remote attacker to execute arbitrary code inside a sandbox via a crafted HTML page. (Chromium security severity: High)
+
+### CVE-2026-9991
+**Score CVSS:** N/A
+
+Inappropriate implementation in Media in Google Chrome on Windows prior to 148.0.7778.216 allowed a remote attacker who had compromised the renderer process to leak cross-origin data via a crafted HTML page. (Chromium security severity: High)
+
+### CVE-2026-9990
+**Score CVSS:** N/A
+
+Use after free in WebAppInstalls in Google Chrome on Mac prior to 148.0.7778.216 allowed a remote attacker who convinced a user to engage in specific UI gestures to potentially exploit heap corruption via a crafted HTML page. (Chromium security severity: High)
+

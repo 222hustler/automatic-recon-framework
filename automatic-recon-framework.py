@@ -148,7 +148,6 @@ for cve_id in cve_ids[:20]:
     )
     if responsescve.status_code == 200:
         data = responsescve.json()
-        print(list(data.keys()))
         cve_details.append(data)
     time.sleep(3)
 
@@ -178,7 +177,7 @@ with open(report, "w") as f:
     
     f.write("## CVEs Found\n\n")
     for cve in cve_details:
-        cve_id = cve.get("id", cve.get("cveId", "N/A"))
+        cve_id = cve.get("cveMetadata", {}).get("cveId", "N/A")
         try:
             description = cve["containers"]["cna"]["descriptions"][0]["value"]
         except:
