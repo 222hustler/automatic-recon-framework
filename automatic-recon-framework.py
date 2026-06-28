@@ -122,7 +122,7 @@ print(f"Unique CVE IDs: {len(cve_ids)}")
 
 cve_details = []
 searchsploit_details = []
-for cve_id in cve_ids:
+for cve_id in cve_ids[:20]:
     responsescve = requests.get(
         f"https://cve.circl.lu/api/cve/{cve_id}",
         verify=False
@@ -165,9 +165,15 @@ with open(report, "w") as f:
     
     f.write("## SMBclient\n\n")
     f.write(f"```\n{smbclient.stdout}\n```\n\n")
+
+    filtered = [
+        (cve, exploits)
+        for cve, exploits in zip(cve_details, searchsploit_details)
+        if exploits
+    ]
     
     f.write("## CVEs Found\n\n")
-    for i, cve in enumerate(cve_details):
+    for cve, exploits in filtered:
         cve_id = cve.get("cveMetadata", {}).get("cveId", "N/A")
         try:
             description = cve["containers"]["cna"]["descriptions"][0]["value"]
@@ -180,14 +186,11 @@ with open(report, "w") as f:
                 score = cve["containers"]["cna"]["metrics"][0]["cvssV3_0"]["baseScore"]
             except:
                 score = "N/A"
-        
+
         f.write(f"### {cve_id}\n")
         f.write(f"**Score CVSS:** {score}\n\n")
         f.write(f"{description}\n\n")
-        
-        exploits = searchsploit_details[i] if i < len(searchsploit_details) else []
-        if exploits:
-            f.write("**Exploits disponibles:**\n\n")
-            for exploit in exploits:
-                f.write(f"- {exploit.get('Title', 'N/A')} — `{exploit.get('Path', 'N/A')}`\n")
-            f.write("\n")
+        f.write("**Exploits disponibles:**\n\n")
+        for exploit in exploits:
+            f.write(f"- {exploit.get('Title', 'N/A')} — `{exploit.get('Path', 'N/A')}`\n")
+        f.write("\n")
