@@ -143,7 +143,7 @@ cve_ids = list(dict.fromkeys(cve_ids))
 
 cve_details = []
 searchsploit_details = []
-for cve_id in cve_ids[:20]:
+for cve_id in cve_ids:
     responsescve = requests.get(
         f"https://cve.circl.lu/api/cve/{cve_id}",
         verify=False
