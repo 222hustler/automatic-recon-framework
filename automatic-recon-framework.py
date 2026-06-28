@@ -8,7 +8,7 @@ import platform
 import json
 
 if platform.system() == "Windows":
-    print("Ce script doit être lancé depuis WSL ou Linux, pas depuis Windows.")
+    print("This script must be run from WSL or Linux, not from Windows.")
     exit()
 
 from pathlib import Path
