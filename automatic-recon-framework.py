@@ -17,7 +17,6 @@ from dotenv import load_dotenv
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 load_dotenv()
-api_key = os.getenv("NVD_API_KEY")
 
 BASE_DIR = Path(__file__).resolve().parent
 wordlist = BASE_DIR / "wordlist" / "common.txt"
@@ -46,7 +45,7 @@ if Path('reports/markdown.txt').exists():
 
 nm = nmap.PortScanner()
 
-url = "192.168.x.x" ## URL OR IP ADD
+url = "192.168.100.135" ## URL OR IP ADD
 
 nm.scan(f'{url}', arguments="-sV -sC -Pn")
 
@@ -66,17 +65,12 @@ gobuster = subprocess.run([
     text=True
 )
 
-if platform.system() == "Windows":
-    enum4linux_cmd = ["wsl", enum4linux_python, enum4linux_script, "-A", f'{ip}']
-    smbclient_cmd = ["wsl", "smbclient", "-L", f'//{ip}', "-N"]
-else:
-    enum4linux_cmd = [enum4linux_python, enum4linux_script, "-A", f'{ip}']
-    smbclient_cmd = ["smbclient", "-L", f'//{ip}', "-N"]
+enum4linux_cmd = [enum4linux_python, enum4linux_script, "-A", f'{ip}']
+smbclient_cmd = ["smbclient", "-L", f'//{ip}', "-N"]
 
 enum4linux = subprocess.run(enum4linux_cmd, capture_output=True, text=True)
 smbclient = subprocess.run(smbclient_cmd, capture_output=True, text=True)
 
-i = 0
 cpelist = []
 
 for host in nm.all_hosts():
@@ -91,55 +85,40 @@ for host in nm.all_hosts():
         for port in lport:
             if nm[host][protocol][port]['state'] == "open":
                 print('Port: %s \tState: %s' % (port, nm[host][protocol][port]['state']))
-                cpelist.append(nm[host][protocol][port]['cpe'].split(':'))
+                cpe_raw = nm[host][protocol][port]['cpe']
+                if cpe_raw:
+                    cpelist.append(cpe_raw.split(':'))
 
-i = 0
+# Remove empty entries
+cpelist = [cpe for cpe in cpelist if cpe != ['']]
+# Remove duplicates
+cpelist = list({tuple(cpe): cpe for cpe in cpelist}.values())
 
-while i < len(cpelist):
-    if cpelist[i] == ['']:
-        cpelist.pop(i)
-    else:
-        i = i + 1
-    
-i = 0
-for i in range(len(cpelist)):
-    cpelist[i].insert(1, '2.3')
+# cpe format: ['cpe', '/a', 'vendor', 'product', 'version', ...]
+# cpe[2] = vendor, cpe[3] = product
 
-cpeurls = []
-i = 0
-for i in range(len(cpelist)):
-    while len(cpelist[i]) < 14:
-        cpelist[i].append('*')
-    cpeurls.append(cpelist[i])
-
-usableurls = []
-for urls in cpeurls:
-    my_str = ':'.join(urls).replace('/', '')
-    usableurls.append(my_str)
-
-
-responsesvuln = []
 cve_ids = []
-for usableurl in usableurls:
-    responsevuln = requests.get(
-        "https://api.vulncheck.com/v3/index/nist-nvd2",
-        params={"cpeName": usableurl},
-        headers={
-            "Accept": "application/json",
-            "Authorization": f"Bearer {api_key}"
-        }
-    )
-    data = responsevuln.json()
-    vulns = data.get("data", [])
-    for vuln in vulns:
-        cve_id = vuln.get("id", "N/A")
-        cve_ids.append(cve_id)
-    if responsevuln.status_code == 200:
-        responsesvuln.append(responsevuln)
-    else:
-        print(f'Error: {responsevuln.status_code} for {usableurl}')
+for cpe in cpelist:
+    if len(cpe) >= 4:
+        vendor = cpe[2]
+        product = cpe[3]
+        print(f"Searching CVEs for: {vendor}/{product}")
+        url_search = f"https://cve.circl.lu/api/search/{vendor}/{product}"
+        response = requests.get(url_search)
+        print(f"Status: {response.status_code}")
+        if response.status_code == 200:
+            data = response.json()
+            results = data.get("results", {})
+            for source in ["cvelistv5", "nvd"]:
+                for item in results.get(source, []):
+                    cve_id = item[1].get("cveMetadata", {}).get("cveId", "N/A")
+                    if cve_id != "N/A":
+                        cve_ids.append(cve_id)
+            print(f"CVEs found so far: {len(cve_ids)}")
+        time.sleep(3)
 
 cve_ids = list(dict.fromkeys(cve_ids))
+print(f"Unique CVE IDs: {len(cve_ids)}")
 
 cve_details = []
 searchsploit_details = []
@@ -158,11 +137,10 @@ for cve_id in cve_ids:
     exploits = data.get("RESULTS_EXPLOIT", [])
     searchsploit_details.append(exploits)
 
-    
     if responsescve.status_code == 200:
         data = responsescve.json()
         cve_details.append(data)
-    time.sleep(3)
+    time.sleep(6)
 
 with open(report, "w") as f:
     f.write("# Recon Report\n\n")
