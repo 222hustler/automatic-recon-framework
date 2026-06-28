@@ -45,7 +45,7 @@ if Path('reports/markdown.txt').exists():
 
 nm = nmap.PortScanner()
 
-url = "192.168.100.135" ## URL OR IP ADD
+url = "192.168.x.x" ## URL OR IP ADD
 
 nm.scan(f'{url}', arguments="-sV -sC -Pn")
 
@@ -102,10 +102,8 @@ for cpe in cpelist:
     if len(cpe) >= 4:
         vendor = cpe[2]
         product = cpe[3]
-        print(f"Searching CVEs for: {vendor}/{product}")
         url_search = f"https://cve.circl.lu/api/search/{vendor}/{product}"
         response = requests.get(url_search)
-        print(f"Status: {response.status_code}")
         if response.status_code == 200:
             data = response.json()
             results = data.get("results", {})
@@ -114,11 +112,9 @@ for cpe in cpelist:
                     cve_id = item[1].get("cveMetadata", {}).get("cveId", "N/A")
                     if cve_id != "N/A":
                         cve_ids.append(cve_id)
-            print(f"CVEs found so far: {len(cve_ids)}")
         time.sleep(3)
 
 cve_ids = list(dict.fromkeys(cve_ids))
-print(f"Unique CVE IDs: {len(cve_ids)}")
 
 cve_details = []
 searchsploit_details = []
@@ -190,7 +186,7 @@ with open(report, "w") as f:
         f.write(f"### {cve_id}\n")
         f.write(f"**Score CVSS:** {score}\n\n")
         f.write(f"{description}\n\n")
-        f.write("**Exploits disponibles:**\n\n")
+        f.write("**Exploits available:**\n\n")
         for exploit in exploits:
             f.write(f"- {exploit.get('Title', 'N/A')} — `{exploit.get('Path', 'N/A')}`\n")
         f.write("\n")
