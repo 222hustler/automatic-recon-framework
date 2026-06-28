@@ -5,6 +5,7 @@ import requests
 import time
 import urllib3
 import platform
+import json
 
 if platform.system() == "Windows":
     print("Ce script doit être lancé depuis WSL ou Linux, pas depuis Windows.")
@@ -45,9 +46,9 @@ if Path('reports/markdown.txt').exists():
 
 nm = nmap.PortScanner()
 
-url = "scanme.nmap.org"
+url = "192.168.x.x" ## URL OR IP ADD
 
-nm.scan(f'{url}', arguments="-sV -sC")
+nm.scan(f'{url}', arguments="-sV -sC -Pn")
 
 ip = nm.all_hosts()[0]
 
@@ -141,11 +142,23 @@ for usableurl in usableurls:
 cve_ids = list(dict.fromkeys(cve_ids))
 
 cve_details = []
+searchsploit_details = []
 for cve_id in cve_ids[:20]:
     responsescve = requests.get(
         f"https://cve.circl.lu/api/cve/{cve_id}",
         verify=False
     )
+    cve_number = cve_id.replace("CVE-", "")
+    searchsploit = subprocess.run(
+        ["searchsploit", "--json", "--cve", cve_number],
+        capture_output=True,
+        text=True,
+    )
+    data = json.loads(searchsploit.stdout)
+    exploits = data.get("RESULTS_EXPLOIT", [])
+    searchsploit_details.append(exploits)
+
+    
     if responsescve.status_code == 200:
         data = responsescve.json()
         cve_details.append(data)
@@ -176,7 +189,7 @@ with open(report, "w") as f:
     f.write(f"```\n{smbclient.stdout}\n```\n\n")
     
     f.write("## CVEs Found\n\n")
-    for cve in cve_details:
+    for i, cve in enumerate(cve_details):
         cve_id = cve.get("cveMetadata", {}).get("cveId", "N/A")
         try:
             description = cve["containers"]["cna"]["descriptions"][0]["value"]
@@ -189,6 +202,14 @@ with open(report, "w") as f:
                 score = cve["containers"]["cna"]["metrics"][0]["cvssV3_0"]["baseScore"]
             except:
                 score = "N/A"
+        
         f.write(f"### {cve_id}\n")
         f.write(f"**Score CVSS:** {score}\n\n")
         f.write(f"{description}\n\n")
+        
+        exploits = searchsploit_details[i] if i < len(searchsploit_details) else []
+        if exploits:
+            f.write("**Exploits disponibles:**\n\n")
+            for exploit in exploits:
+                f.write(f"- {exploit.get('Title', 'N/A')} — `{exploit.get('Path', 'N/A')}`\n")
+            f.write("\n")
